@@ -1,23 +1,10 @@
-		.data
-vetor:		.space 400
-n:		.word 50
-
-main:	
-	la a0, vetor
-	lw a1, n
-	call set_vector
-	la a0, vetor
-	li a1, 0
-	lw a2, n
-	jal quick_Sort
-	la a0, vetor
-	lw a1, n
-	call print
-fim:
-	li a7, 93
-	li a0, 0
-	ecall
-	
 #------------- Quick Sort -------------
+# a0 = vetor, a1 = inicio, a2 = fim
 quick_sort:
-	
+	bge a2, a1, fim
+	mv s0, a0
+	call particiona
+	jal quick_sort
+	jal quick_sort
+fim: 
+	ret
