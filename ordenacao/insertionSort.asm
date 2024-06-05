@@ -1,8 +1,8 @@
-		.data
+			.data
 vetor:		.space 400
-n:		.word 50
+n:			.word 6
 
-		.text
+			.text
 		
 main:	
 	la a0, vetor
@@ -26,11 +26,11 @@ insertion_Sort:
 for0:
 	beq t0, a1, fimf	# Se i for = n volta para o loop
 	lw t1, 0(a0) 		# Carrega o min, min = vetor[i]
-	mv t2, t0 		# Inicia a 2° variável de controle, j = i
+	mv t2, t0 		# Inicia a 2ï¿½ variï¿½vel de controle, j = i
 	mv t3, a0		# Copia o valor do vetor para t3, v[j]
 for1:
-	beqz t2, inc		# Só faça se j > 0
-	lw t4, -4(t3)		# Acha a posição anterior do vetor[j]
+	beqz t2, inc		# Sï¿½ faï¿½a se j > 0
+	lw t4, -4(t3)		# Acha a posiï¿½ï¿½o anterior do vetor[j]
 	bge t1, t4, inc		# Se min >= vetor[j-1] ele vai atualizar o v[j]
 	sw t4, 0(t3)		# Troca o valor de vetor[j] para vetor[j-1]
 	addi t2, t2, -1		# Incrementa j, j--
