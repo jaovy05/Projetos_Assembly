@@ -37,8 +37,7 @@ main:
 	beq a0, a1, sair
 	li a1, 2
 	beq a0, a1, jogar
-	la a0, player1
-	la a1, player2
+	la a2, player1
 	call config
 
 jogar:

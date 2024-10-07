@@ -43,7 +43,8 @@ config_robo:	.string	"Robo - vitória(s): "
 config:
 	addi sp, sp, -4
 	sw ra, 0(sp)
-	
+
+config_menu:
 	la a0, menuS
 	li a1, 7
 	call input	# ret em a0 o valor do input
@@ -65,7 +66,7 @@ qtd_jogadores:
 	jal input
 	
 	mv s0, a0
-	j config	
+	j config_menu
 tabuleiro:
 	la a0, txt_tabul
 	li a1, 2
@@ -74,19 +75,19 @@ tabuleiro:
 	# a0 = 1 | 01 and 10 = 00
 	and a0, a0, a1	# se o retorno for 1 vai zerar, se for 2 fica 2
 	addi s1, a0, 7	# 0 + 7 = 7 colunas e 2 + 7 = 9
-	j config
+	j config_menu
 mode:
 	la a0, txt_mode
 	li a1, 2
 	jal input
 	
 	mv s2, a0
-	j config	
+	j config_menu	
 clear:
 	mv s3, zero	# zera win_p1
 	mv s4, zero	# zera win_p2
 	mv s5, zero	# zera robo
-	j config
+	j config_menu
 	
 out_config:
 	li a7, 4
@@ -123,7 +124,7 @@ out_config:
 	li t0, 1
 	beq t0, s0, out_conf_robo	
 	
-	addi a0, a2, 20 # player 2 está 20 bytes dps do jogador 1
+	addi a0, a2, 21 # player 2 está 21 bytes dps do jogador 1
 	ecall
 	la a0, config_player
 	ecall
@@ -133,7 +134,7 @@ out_config:
 	li a7, 11
 	li a0, '\n'
 	ecall
-	j config
+	j config_menu
 out_conf_robo:
 	la a0, config_robo
 	ecall
@@ -149,12 +150,12 @@ out_conf_robo:
 	li a7, 4
 	la a0, config_diff2
 	ecall
-	j config
+	j config_menu
 out_conf_facil:
 	li a7, 4
 	la a0, config_diff1
 	ecall
-	j config
+	j config_menu
 in_name:	
 	la a0, txt_player1
 	li a7, 4
@@ -175,13 +176,27 @@ in_name:
 	ecall
 	
 	li a7, 8
-	addi a0, a2, 20
+	addi a0, a2, 21
 	ecall
 	
 	jal remove_quebra
-	j config
+	j config_menu
 retorno_main:
 	lw ra, 0(sp)
 	addi sp, sp, 4
 	ret
-	
+
+	#########################################################
+	# void remove_quebra( char* p1)				#
+	# Entrada: 						#
+	#	a0 = endereço da string p1			#
+	#########################################################
+remove_quebra:
+	mv t0, a0
+
+for:
+	lb t1, 0(t0)
+	addi t0, t0, 1
+	bnez t1, for
+	sb zero, -1(t0)
+	ret
