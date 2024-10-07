@@ -1,9 +1,10 @@
 .global fibonacci
+.text
 fibonacci:
 	li t0, 2
 	ble a0, t0, fim        # se a entrada for menor que 2 retorna 1 
 
-	addi sp, sp, -12       # empilha 3 posições de memória
+	addi sp, sp, -12       # empilha 3 posiï¿½ï¿½es de memï¿½ria
 	sw a0, 8(sp)           # salva a0 na pilha
 	sw ra, 4(sp)           # salva ra na pilha
 	sw a1, 0(sp)           # salva s0 na pilha
