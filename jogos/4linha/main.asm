@@ -99,12 +99,21 @@ jogando:
 	addi s7, s7, -1
 	j partida
 fimpartida:
+	la a0, matriz
+	mv a1, s1
+	jal imprime_tabuleiro
 	li t0, 2
 	beq s6, t0, winJ2
+	addi s3, s3, 1
 	la a0, player1
 	j venceu
 winJ2:
 	la a0, player2
+	beq s0, t0, soma_winj2
+	addi s5, s5, 1
+	j venceu
+soma_winj2:
+	addi s4, s4, 1
 venceu:
 	li a7, 4
 	ecall
