@@ -169,7 +169,7 @@ in_name:
 	jal remove_quebra
 	
 	li t0, 1
-	beq s0, t0, config
+	beq s0, t0, config_menu
 	
 	la a0, txt_player2
 	li a7, 4
@@ -198,5 +198,5 @@ for:
 	lb t1, 0(t0)
 	addi t0, t0, 1
 	bnez t1, for
-	sb zero, -1(t0)
+	sb zero, -2(t0)	# -1 do incremento e -1 para a penultimapos
 	ret

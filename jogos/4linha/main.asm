@@ -11,6 +11,10 @@ txt_jogada:	.string	" faça a sua jogada: "
 txt_win:	.string " Venceu!!\n"
 txt_empate:	.string "\nEmpate!!"
 
+txt_comeca:	.ascii  "Quem começa?\n"
+txt_comecaP:	.ascii	"1) Player\n"
+txt_comecaR:	.asciz	"2) Robo\n"
+
 player1:	.string "Jogador 1\01234567890"
 player2:	.string "Jogador 2\01234567890"
 	.text	
@@ -43,8 +47,13 @@ main:
 jogar:
 	la a0, matriz
 	mv a1, s1
-	jal inicia_tabuleiro #jogar
+	jal inicia_tabuleiro #jogar 
 	li s6, 1
+	bne s0, s6, partida	# Se for 1 jogador, pergunta quem começa
+	
+	la a0, txt_comeca
+	li a1, 2
+	
 partida:
 	beqz s7, empate
 	la a0, matriz
