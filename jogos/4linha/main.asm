@@ -53,7 +53,10 @@ jogar:
 	
 	la a0, txt_comeca
 	li a1, 2
+	call input
 	
+	beq a0, s6, partida
+	li s6, 2
 partida:
 	beqz s7, empate
 	la a0, matriz
