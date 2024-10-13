@@ -29,7 +29,7 @@ player2:	.string "Jogador 2\01234567890"
 start:
 	li s0, 1
 	li s1, 7
-	li s2, 1
+	li s2, 0
 	li s3, 0
 	li s4, 0
 	li s5, 0
@@ -43,7 +43,7 @@ main:
 	beq a0, a1, jogar
 	la a2, player1
 	call config
-
+	j main
 jogar:
 	la a0, matriz
 	mv a1, s1
@@ -314,19 +314,21 @@ ganhou:
 	li a0, 0
 	addi a1, a2, -34
 	ret
-	#########################################################################
-	# int sequencia(int jogador,int* posição, int soma, casas procuradas	#
-	# Entrada:								#
-	#	a2 jogador							#
-	#	a5 posição de inicio						#
-	#	a6 distancia entre as comparacoes				#
-	#	a7 casas procuradas						#
-	# Saida:								#
-	#	a5 0 se deu certo e -1 se deu errado				#
-	#	a2 jogador							#
-	#########################################################################	
+	#################################################################################
+	# int sequencia(int jogador, i sequencia, i* posição, i soma,i casas procuradas	#
+	# Entrada:									#
+	#	a2 jogador								#
+	#	a3 numero de elementos da sequecia					#
+	#	a5 posição de inicio							#
+	#	a6 distancia entre as comparacoes					#
+	#	a7 casas procuradas							#
+	# Saida:									#
+	#	a6 0 se deu certo e -1 se deu errado					#
+	#	a2 jogador								#
+	#	a5 posicao do elemento							#
+	#################################################################################	
 sequencia:
-	li t1, 4
+	mv t1, a3
 forfind:
 	beqz t1, end_seq
 	beqz a7, sequencia_nao_encontrada
@@ -340,8 +342,8 @@ forfind:
 	beq a2, t2, forfind
 	j sequencia
 sequencia_nao_encontrada:
-	li a5, -1
+	li a6, -1
 	ret
 end_seq:
-	li a5, 0
+	li a6, 0
 	ret
