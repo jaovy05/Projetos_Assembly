@@ -17,6 +17,13 @@ txt_comecaR:	.asciz	"2) Robo\n"
 
 player1:	.string "Jogador 1\01234567890"
 player2:	.string "Jogador 2\01234567890"
+
+robo0:	.string "Héstia"
+robo1:	.string "Teseu"
+robo2:	.string "Ares"
+robo3:	.string "Atena"
+robo4:	.string "Caos"
+
 	.text	
 	# s0 = registrador qtd player
 	# s1 = registrador tam tabuleiro
@@ -44,6 +51,9 @@ main:
 	la a2, player1
 	call config
 	j main
+robo:
+	jal joga_robo
+	j verificando_acerto
 jogar:
 	la a0, matriz
 	mv a1, s1
@@ -60,7 +70,6 @@ jogar:
 partida:
 	beqz s7, empate
 	la a0, matriz
-	mv t0, a0
 	mv a1, s1
 	jal imprime_tabuleiro
 	li t0, 1
@@ -77,23 +86,23 @@ pede_jogada:
 	mv a1, s1
 	jal input
 	addi a0, a0, -1
-	j jogando
-robo:
-	addi a1, s1, -1
-	li a7, 42
-	ecall
-	mv a1, s1	# refatorar depois
+
 jogando:
-	mv a4, a0		# Move a coluna jogada para o verifica_vencedor
+	mv a4, a0		# Move a coluna jogada para o verifica_vencedoreea
 	mv a3, s6
 	la a2, matriz
 	jal insere
-	bnez a0, partida
+	bnez a0, partida	
+	mv s10,	a1		# refatorar salva a ultima jogada do p1
+	mv s11, a4
+verificando_acerto:
 	la a0, matriz
 	mv a3, a1
 	mv a1, s1
 	mv a2, s6
+	li a5, 4
 	jal verifica_vencedor
+
 	beqz a0, fimpartida
 	xori s6, s6, 3
 	addi s7, s7, -1
@@ -233,35 +242,41 @@ erro_func:
 	#	a2 jogador												#
 	#	a4 coluna jogada											#
 	#	a3 linha jogada												#
+	#	a5 quantas linhas verifica										#										#
 	# Saida:													#
 	#	a0 1 se deu certo e -1 se deu errado									#
 	#	a1 jogador												#
 	#################################################################################################################
 verifica_vencedor:
-	mv s11, ra
-	mul t0, a1, a3		# Multiplica as colunas totais com linha jogada para dar o salto
+	sw ra, -4(sp)
+	addi sp, sp, -4
+	mv t3, a3
+	mv a3, a5
+	
+	mul t0, a1, t3		# Multiplica as colunas totais com linha jogada para dar o salto
 	add t0, t0, a0		# Soma o salto da linha com a matriz
 	addi a2, a2, 34		# Soma 34 no jogador para conseguir seu respectivo caracter
-	
+
 	mv a5, t0		# Vai conferir se a linha bateu
 	li a6, 1		# conferir somente 1 pos cada vez
 	mv a7, a1
 	jal sequencia
-	beqz a5, ganhou
+	beqz a6, ganhou
 
 	li t1, 2		# Se a linha for maior que 2, não forma 4 em linha
-	bgt a3, t1, diagonal
+	bgt t3, t1, diagonal
 	
 	add t0, t0, a4		# Agora faz o salto para a coluna 
 	
 	mv a5, t0
 	mv a6, a1
 	li a7, 4
+
 	jal sequencia
-	beqz a5, ganhou 
+	beqz a6, ganhou 
 
 diagonal:	
-	add t2, a4, a3
+	add t2, a4, t3
 	addi a6, a1, -1
 	neg a6, a6
 	
@@ -273,22 +288,22 @@ diagonal:
 	mv a7, t2
 	
 	jal sequencia
-	beqz a5, ganhou 
+	beqz a6, ganhou 
 	j diagonal_inversa
 	
 calcula_coluna:
-	addi t3, t2, -5
-	
 	mul a5, a1, t1	
+	
+	addi t1, t2, -5
 	add a5, a5, a0
-	add a5, a5, t3
-	sub a7, a1, t3
+	add a5, a5, t1
+	sub a7, a1, t1
 	
 	jal sequencia
-	beqz a5, ganhou
+	beqz a6, ganhou
 	
 diagonal_inversa:
-	sub t2, a3, a4
+	sub t2, t3, a4
 	addi a6, a1, 1
 		
 	bltz t2, calcula_coluna_inversa
@@ -299,7 +314,7 @@ diagonal_inversa:
 	sub a7, a7, t2
 	
 	jal sequencia
-	beqz a5, ganhou 
+	beqz a6, ganhou 
 	
 calcula_coluna_inversa:
 	sub a5, a0, t2
@@ -308,11 +323,16 @@ calcula_coluna_inversa:
 	
 	jal sequencia
 	mv ra, s11
-	bnez a5, erro_func 
+	bnez a6, sem_sequencia 
 ganhou:
-	mv ra, s11
 	li a0, 0
 	addi a1, a2, -34
+	j end
+sem_sequencia:
+	li a0, -1
+end:
+	lw ra, 0(sp)
+	addi sp, sp, 4
 	ret
 	#################################################################################
 	# int sequencia(int jogador, i sequencia, i* posição, i soma,i casas procuradas	#
@@ -346,4 +366,52 @@ sequencia_nao_encontrada:
 	ret
 end_seq:
 	li a6, 0
+	ret
+	#########################################################
+	# Joga robo 						#
+	# Entrada						#
+	#	a0  robo					#
+	#	s1  tamanho do tabuleiro			#
+	#	s11 coluna jogada pelo player			#
+	#	s10 linha  jogada pelo player			#
+	# Saida:						#
+	#	a1 tamanho do tabuleiro				#
+	#########################################################
+joga_robo:
+	sw ra, -4(sp)
+	addi sp, sp, -4
+	beqz a0, seleciona_facil
+	
+	la a0, matriz
+	mv a1, s1
+	li a2, 1
+	mv a3, s10
+	mv a4, s11
+	li a5, 3
+	jal verifica_vencedor
+	bnez a6, seleciona_facil
+	
+	lb t0, (a5)
+	li t1, '_'
+	bne t1, t0, seleciona_facil
+	
+	add t0, a5, s1
+	lb t0, 0(t0)
+	beq t0, t1, seleciona_facil
+	li t1, '$'
+	sb t1, (a5)
+	j fim_select
+seleciona_facil:
+	addi a1, s1, -1
+	li a7, 42
+	ecall
+	
+	mv a1, s1
+	la a2, matriz
+	li a3, 2
+	jal insere 
+	bnez a0, seleciona_facil
+fim_select:
+	lw ra, (sp)
+	addi sp, sp, 4
 	ret

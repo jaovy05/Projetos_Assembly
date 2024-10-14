@@ -81,7 +81,7 @@ mode:
 	li a1, 2
 	jal input
 	
-	mv s2, a0
+	addi s2, a0, -1
 	j config_menu	
 clear:
 	mv s3, zero	# zera win_p1
