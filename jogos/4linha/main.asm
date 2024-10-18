@@ -391,21 +391,22 @@ joga_robo:
 	jal verifica_vencedor
 	bnez a6, seleciona_facil
 	
-	lb t0, (a5)
-	li t1, '_'
-	bne t1, t0, seleciona_facil
+	la a2, matriz
+	sub a5, a5, a2
+	rem a0, a5, s1
 	
-	add t0, a5, s1
-	lb t0, 0(t0)
-	beq t0, t1, seleciona_facil
-	li t1, '$'
-	sb t1, (a5)
+	mv a4, a0		# Move a coluna jogada para o verifica_vencedoreea
+	mv a1, s1
+	li a3, 2
+	jal insere 
+	bnez a0, seleciona_facil
+
 	j fim_select
 seleciona_facil:
 	addi a1, s1, -1
 	li a7, 42
 	ecall
-	
+	mv a4, a0		# Move a coluna jogada para o verifica_vencedoreea
 	mv a1, s1
 	la a2, matriz
 	li a3, 2
@@ -415,3 +416,7 @@ fim_select:
 	lw ra, (sp)
 	addi sp, sp, 4
 	ret
+
+	
+	
+	
